@@ -1,7 +1,7 @@
 #pragma once
 
 #include "esphome.h"
-#include <cmath>
+#include <cmath>        // Required for std::isnan
 
 namespace esphome {
 namespace filtered_dallas {
@@ -15,13 +15,11 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
   void setup() override {}
 
   void update() override {
-    if (parent_ == nullptr)
-      return;
+    if (parent_ == nullptr) return;
 
     float x = parent_->state;
 
-    if (std::isnan(x))
-      return;
+    if (std::isnan(x)) return;
 
     if (std::isnan(last_good_)) {
       last_good_ = x;
@@ -34,7 +32,7 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
     if (delta > 15.0f) {
       reject_count_++;
 
-      ESP_LOGW("filtered_dallas", "Spike rejected %.2f (last %.2f)", x, last_good_);
+      ESP_LOGW("filtered_dallas", "Spike rejected %.2f (last good %.2f)", x, last_good_);
 
       if (reject_count_ >= 3) {
         last_good_ = x;
