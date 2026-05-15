@@ -16,7 +16,11 @@ CONF_SPIKE_THRESHOLD = "spike_threshold"
 CONF_MAX_REJECTS = "max_rejects"
 
 CONFIG_SCHEMA = sensor.sensor_schema(
-    FilteredDallasSensor
+    FilteredDallasSensor,
+    unit_of_measurement="°C",
+    accuracy_decimals=1,
+    device_class="temperature",
+    state_class="measurement",
 ).extend(
     {
         cv.GenerateID(): cv.declare_id(FilteredDallasSensor),
