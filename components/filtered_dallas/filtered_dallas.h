@@ -1,31 +1,16 @@
 #pragma once
 
-#include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/core/log.h"
-
 #include <cmath>
 #include <limits>
 
 namespace esphome {
 namespace filtered_dallas {
 
-class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
+class FilteredDallasSensor : public sensor::Sensor {
  public:
-  explicit FilteredDallasSensor(uint64_t address)
-      : address_(address),
-        last_good_(std::numeric_limits<float>::quiet_NaN()) {}
-
-  void set_parent(sensor::Sensor *parent) { parent_ = parent; }
-
-  void setup() override {}
-
-  void update() override {
-    if (parent_ == nullptr)
-      return;
-
-    float x = parent_->state;
-
+  void input(float x) {
     if (std::isnan(x))
       return;
 
@@ -38,14 +23,14 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
 
     float delta = fabsf(x - last_good_);
 
-    if (delta > 15.0f) {
+    if (delta > spike_threshold_) {
       reject_count_++;
 
       ESP_LOGW("filtered_dallas",
-               "Spike rejected %.2f (last good %.2f)",
-               x, last_good_);
+               "Spike rejected %.2f (last good %.2f, count %d)",
+               x, last_good_, reject_count_);
 
-      if (reject_count_ >= 3) {
+      if (reject_count_ >= max_rejects_) {
         last_good_ = x;
         reject_count_ = 0;
       }
@@ -59,11 +44,13 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
     publish_state(x);
   }
 
- protected:
-  uint64_t address_;
-  sensor::Sensor *parent_{nullptr};
+  void set_spike_threshold(float t) { spike_threshold_ = t; }
+  void set_max_rejects(int r) { max_rejects_ = r; }
 
-  float last_good_;
+ protected:
+  float last_good_{NAN};
+  float spike_threshold_{15.0f};
+  int max_rejects_{3};
   int reject_count_{0};
 };
 
