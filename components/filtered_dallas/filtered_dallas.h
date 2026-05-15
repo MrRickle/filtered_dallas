@@ -19,9 +19,9 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
 
     float x = parent_->state;
 
-  //  if (std::isnan(x)) return;
+    if (std::isnan(x)) return;
 
-  //  if (std::isnan(last_good_)) {
+    if (std::isnan(last_good_)) {
       last_good_ = x;
       publish_state(x);
       return;
