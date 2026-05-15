@@ -1,6 +1,7 @@
 #pragma once
 
 #include "esphome.h"
+#include <cmath>
 
 namespace esphome {
 namespace filtered_dallas {
@@ -19,7 +20,7 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
 
     float x = parent_->state;
 
-    if (isnan(x))
+    if (std::isnan(x))
       return;
 
     if (isnan(last_good_)) {
