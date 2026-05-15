@@ -23,7 +23,7 @@ class FilteredDallasSensor : public PollingComponent, public sensor::Sensor {
     if (std::isnan(x))
       return;
 
-    if (isnan(last_good_)) {
+    if (std::isnan(last_good_)) {
       last_good_ = x;
       publish_state(x);
       return;
