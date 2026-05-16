@@ -27,7 +27,7 @@ CONFIG_SCHEMA = sensor.sensor_schema(
 
         cv.Optional(CONF_SPIKE_THRESHOLD, default=4.0): cv.float_,
 
-        cv.Optional(CONF_MAX_REJECTS, default=3): cv.int_,
+        cv.Optional(CONF_MAX_REJECTS, default=5): cv.int_,
     }
 )
 
